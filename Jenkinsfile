@@ -23,7 +23,7 @@ node {
 
     // Stage Run : Test de l'image en lançant un conteneur temporaire
     stage('Run') {
-        img.withRun("--name run-${env.BUILD_ID} -p 8080:80") { c ->
+        img.withRun("--name run-${env.BUILD_ID} -p 9090:80") { c ->
             // Attendre que le conteneur démarre et tester avec curl
             sh 'sleep 5 && curl http://localhost:8080'
         }
