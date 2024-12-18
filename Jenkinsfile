@@ -23,4 +23,17 @@ node {
 
     // Stage Run : Test de l'image en lançant un conteneur temporaire
     stage('Run') {
-        img.withRun("--name run-${env.BUILD_ID} -p
+        img.withRun("--name run-${env.BUILD_ID} -p 8080:80") { c ->
+            // Attendre que le conteneur démarre et tester avec curl
+            sh 'sleep 5 && curl http://localhost:8080'
+        }
+    }
+
+    // Stage Push : Pousser l'image vers le registre GitLab
+    stage('Push') {
+        docker.withRegistry('https://registry.gitlab.com', 'reg1') {
+            img.push('latest') // Tag 'latest'
+            img.push() // Tag basé sur BUILD_ID
+        }
+    }
+}
