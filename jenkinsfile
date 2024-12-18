@@ -6,11 +6,15 @@ node {
     def IMAGE = "${registryProjet}:version-${env.BUILD_ID}"
 
     echo "IMAGE = $IMAGE"
+stage('Clone') {
+    checkout([
+        $class: 'GitSCM',
+        branches: [[name: '*/main']],
+        userRemoteConfigs: [[url: 'https://github.com/takidth/jenkinsdocker.git']]
+    ])
+}
 
-    // Stage Clone : Récupération du code source
-    stage('Clone') {
-        checkout scm
-    }
+
 
     // Stage Build : Construction de l'image Docker
     def img = stage('Build') {
