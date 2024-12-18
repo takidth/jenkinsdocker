@@ -6,15 +6,15 @@ node {
     def IMAGE = "${registryProjet}:version-${env.BUILD_ID}"
 
     echo "IMAGE = $IMAGE"
-stage('Clone') {
-    checkout([
-        $class: 'GitSCM',
-        branches: [[name: '*/main']],
-        userRemoteConfigs: [[url: 'https://github.com/takidth/jenkinsdocker.git']]
-    ])
-}
 
-
+    // Stage Clone : Clonage depuis la branche 'main'
+    stage('Clone') {
+        checkout([
+            $class: 'GitSCM',
+            branches: [[name: 'main']],
+            userRemoteConfigs: [[url: 'https://github.com/takidth/jenkinsdocker.git']]
+        ])
+    }
 
     // Stage Build : Construction de l'image Docker
     def img = stage('Build') {
@@ -23,19 +23,4 @@ stage('Clone') {
 
     // Stage Run : Test de l'image en lançant un conteneur temporaire
     stage('Run') {
-        img.withRun("--name run-${env.BUILD_ID} -p 8080:80") { c ->
-            // Attendre que le conteneur démarre et tester avec curl
-            sh 'sleep 5 && curl http://localhost:8080'
-        }
-    }
-
-    // Stage Push : Pousser l'image vers le registre GitLab
-    stage('Push') {
-        docker.withRegistry('https://registry.gitlab.com', 'reg1') {
-            // Pousser l'image avec le tag 'latest'
-            img.push('latest')
-            // Pousser l'image avec son numéro de build
-            img.push()
-        }
-    }
-}
+        img.withRun("--name run-${env.BUILD_ID} -p
